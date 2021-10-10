@@ -60,7 +60,7 @@ task diffChangelog(type: JavaExec) {
     main = "liquibase.integration.commandline.Main"
 
     args "--changeLogFile=src/main/resources/db/" + buildTimestamp() + "_changelog.xml"
-    args "--referenceUrl=hibernate:spring:personal.todo.model?dialect=org.hibernate.dialect.PostgreSQL9Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+    args "--referenceUrl=hibernate:spring:br.mhm.passwordmanagerapi.model?dialect=org.hibernate.dialect.PostgreSQL9Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
     args "--username=" + props.getProperty('spring.datasource.username')
     args "--password=" + props.getProperty('spring.datasource.password')
     args "--url=" + props.getProperty('spring.datasource.url')
