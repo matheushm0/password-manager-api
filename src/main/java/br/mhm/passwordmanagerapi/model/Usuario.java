@@ -19,6 +19,7 @@ public class Usuario {
 	private String nome;
 	private String email;
 	private String senha;
+	private boolean ativado;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,5 +43,9 @@ public class Usuario {
 	public String getSenha() {
 		return senha;
 	}
-
+	
+	@NotNull
+	public boolean isAtivado() {
+			return ativado;
+	}
 }
