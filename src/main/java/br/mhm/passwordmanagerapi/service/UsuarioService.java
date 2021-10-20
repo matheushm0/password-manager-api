@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.mhm.passwordmanagerapi.model.Usuario;
@@ -15,7 +16,8 @@ import br.mhm.passwordmanagerapi.security.UserCredentials;
 @Service
 public class UsuarioService implements UserDetailsService {
 
-	@Autowired UsuarioRepository usuarioRepository;
+	@Autowired private UsuarioRepository usuarioRepository;
+	@Autowired private PasswordEncoder passwordEncoder;
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -36,5 +38,9 @@ public class UsuarioService implements UserDetailsService {
         }
 
         return new UserCredentials(usuario);
+    }
+    
+    public String encryptPassword(String senha) {
+    	return passwordEncoder.encode(senha);
     }
 }

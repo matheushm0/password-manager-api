@@ -61,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         .authorizeRequests()
 
-        .antMatchers("/{version:v\\d+}/login/**")
+        .antMatchers("/{version:v\\d+}/login/**", "/{version:v\\d+}/cadastro/**")
         .permitAll()
 
         .anyRequest().authenticated();
