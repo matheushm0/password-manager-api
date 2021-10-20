@@ -15,14 +15,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import br.mhm.passwordmanagerapi.model.Senha;
 import br.mhm.passwordmanagerapi.repository.SenhaRepository;
+import br.mhm.passwordmanagerapi.service.ValidationService;
 
 @RestController
 @RequestMapping("/v1/senhas")
 public class SenhaController extends AbstractController {
 	
 	@Autowired SenhaRepository senhaRepository;
+	@Autowired private ValidationService validationService;
 	
 	@GetMapping
 	public Page<Senha> getSenhas(Pageable pageable) {
@@ -37,13 +41,11 @@ public class SenhaController extends AbstractController {
 	
 	@PostMapping
 	public ResponseEntity<?> createSenha(@RequestBody Senha senha) {
-		
-		//TODO
-//        ObjectNode error = validationService.validate(modalidade);
-//
-//        if (error != null) {
-//            return validationFailed(error);
-//        }
+        ObjectNode error = validationService.validate(senha);
+
+        if (error != null) {
+            return validationFailed(error);
+        }
 		
         senha.setId(null);
         senha = senhaRepository.save(senha);
@@ -54,15 +56,15 @@ public class SenhaController extends AbstractController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSenha(@PathVariable UUID id, @RequestBody Senha senha)
     {
-        //TODO
-//        if (!senhaRepository.findById(id).isPresent()) {
-//            return idNotFound(id);
-//        }
-//        ObjectNode error = validationService.validate(modalidade);
-//
-//        if (error != null) {
-//            return validationFailed(error);
-//        }
+        if (!senhaRepository.findById(id).isPresent()) {
+            return idNotFound(id);
+        }
+        
+        ObjectNode error = validationService.validate(senha);
+
+        if (error != null) {
+            return validationFailed(error);
+        }
 
         senha.setId(id);
         senhaRepository.save(senha);
@@ -73,6 +75,10 @@ public class SenhaController extends AbstractController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSenha(@PathVariable UUID id)
     {
+        if (!senhaRepository.findById(id).isPresent()) {
+            return idNotFound(id);
+        }
+
         senhaRepository.deleteById(id);
         return ok();
     }	

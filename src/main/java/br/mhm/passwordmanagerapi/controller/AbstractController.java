@@ -23,6 +23,10 @@ public class AbstractController {
         return json().put("status", "success");
     }
     
+    protected ObjectNode failed() {
+        return json().put("status", "failed");
+    }
+    
     protected ObjectNode error(String description) {
         return json().put("error", description);
     }
@@ -48,6 +52,14 @@ public class AbstractController {
     
     protected ResponseEntity<ObjectNode> notFound(String description) {
         return status(HttpStatus.NOT_FOUND).body(error(description));
+    }
+    
+    protected ResponseEntity<ObjectNode> idNotFound(Object id) {
+        return status(HttpStatus.NOT_FOUND).body(error("ID " + id + " not found"));
+    }
+    
+    protected ResponseEntity<?> validationFailed(ObjectNode error) {
+        return ok(failed().set("rejected", error));
     }
 
 }
