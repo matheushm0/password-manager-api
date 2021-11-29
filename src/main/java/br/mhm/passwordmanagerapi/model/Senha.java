@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -21,6 +23,7 @@ public class Senha {
 	private String username;
 	private String senha;
 	private String url;
+	private Usuario usuario;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,4 +57,11 @@ public class Senha {
 	public String getUrl() {
 		return url;
 	}
+	
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @NotNull
+    public Usuario getUsuario() {
+        return usuario;
+    }
 }

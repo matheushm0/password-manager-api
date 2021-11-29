@@ -17,44 +17,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import br.mhm.passwordmanagerapi.dto.SenhaDTO;
 import br.mhm.passwordmanagerapi.model.Senha;
+import br.mhm.passwordmanagerapi.model.Usuario;
 import br.mhm.passwordmanagerapi.repository.SenhaRepository;
+import br.mhm.passwordmanagerapi.repository.UsuarioRepository;
 import br.mhm.passwordmanagerapi.service.ValidationService;
 
 @RestController
-@RequestMapping("/v1/senhas")
+@RequestMapping("/v1/{userId}/senhas")
 public class SenhaController extends AbstractController {
 	
 	@Autowired SenhaRepository senhaRepository;
+	@Autowired UsuarioRepository usuarioRepository;
 	@Autowired private ValidationService validationService;
 	
 	@GetMapping
-	public Page<Senha> getSenhas(Pageable pageable) {
-		return senhaRepository.findAll(pageable);
+	public Page<SenhaDTO> getSenhas(@PathVariable UUID userId, Pageable pageable) {
+		return senhaRepository.findAllByUsuarioId(pageable, userId);
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getSenhaById(@PathVariable UUID id) {
-        Senha senha = senhaRepository.findById(id).orElse(null);
+	public ResponseEntity<?> getSenhaById(@PathVariable UUID userId, @PathVariable UUID id) {
+        SenhaDTO senha = senhaRepository.findByIdAndUsuarioId(id, userId).orElse(null);
         return senha != null ? ok(senha) : notFound("Item not found");
 	}
 	
+	//TODO return caso userId null 
 	@PostMapping
-	public ResponseEntity<?> createSenha(@RequestBody Senha senha) {
-        ObjectNode error = validationService.validate(senha);
+	public ResponseEntity<?> createSenha(@PathVariable UUID userId, @RequestBody Senha senha) {
+        Usuario usuario = usuarioRepository.findById(userId).orElse(null);
+	    senha.setUsuario(usuario);
+	    
+		ObjectNode error = validationService.validate(senha);
 
         if (error != null) {
             return validationFailed(error);
         }
-		
+        		
         senha.setId(null);
         senha = senhaRepository.save(senha);
 		
 		return created(senha.getId());
 	}
 	
+	//TODO validacao usuario
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSenha(@PathVariable UUID id, @RequestBody Senha senha)
+    public ResponseEntity<?> updateSenha(@PathVariable UUID userId, @PathVariable UUID id, @RequestBody Senha senha)
     {
         if (!senhaRepository.findById(id).isPresent()) {
             return idNotFound(id);
@@ -73,7 +82,7 @@ public class SenhaController extends AbstractController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSenha(@PathVariable UUID id)
+    public ResponseEntity<?> deleteSenha(@PathVariable UUID userId, @PathVariable UUID id)
     {
         if (!senhaRepository.findById(id).isPresent()) {
             return idNotFound(id);

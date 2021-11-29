@@ -1,11 +1,14 @@
 package br.mhm.passwordmanagerapi.model;
 
+import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,6 +23,7 @@ public class Usuario {
 	private String email;
 	private String senha;
 	private boolean ativado;
+	private List<Senha> senhas;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,4 +52,9 @@ public class Usuario {
 	public boolean isAtivado() {
 			return ativado;
 	}
+	
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "usuario")
+    public List<Senha> getSenhas() {
+        return senhas;
+    }
 }
