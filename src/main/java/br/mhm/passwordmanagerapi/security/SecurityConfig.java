@@ -23,64 +23,60 @@ import br.mhm.passwordmanagerapi.service.UsuarioService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	@Autowired private UsuarioService usuarioService;	
-    @Autowired private JwtAuthenticationEntryPoint unauthorizedHandler;
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer()
-    {
-        return new WebMvcConfigurer()
-        {
-            @Override
-            public void addCorsMappings(CorsRegistry registry)
-            {
-                registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedHeaders("*")
-                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH");
-            }
-        };
-    } 
-    
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
-    
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("*").allowedHeaders("*").allowedMethods("GET", "POST",
+						"DELETE", "PUT", "PATCH");
+			}
+		};
+	}
+
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter();
+	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-    @Override
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
-	
-    @Override
-    protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
-        authBuilder.userDetailsService(usuarioService).passwordEncoder(passwordEncoder());
-    }
-    
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        .cors().and()
 
-        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+	@Override
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	protected AuthenticationManager authenticationManager() throws Exception {
+		return super.authenticationManager();
+	}
 
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+	@Override
+	protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
+		authBuilder.userDetailsService(usuarioService).passwordEncoder(passwordEncoder());
+	}
 
-        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.cors().and()
 
-        .authorizeRequests()
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
-        .antMatchers("/{version:v\\d+}/login/**", "/{version:v\\d+}/cadastro/**")
-        .permitAll()
+				.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
-        .anyRequest().authenticated();
-    }
+				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+
+				.authorizeRequests()
+
+				.antMatchers("/{version:v\\d+}/login/**", "/{version:v\\d+}/cadastro/**",
+						"/{version:v\\d+}/gerar-senha/**")
+				.permitAll()
+
+				.anyRequest().authenticated();
+	}
 }
